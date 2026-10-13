@@ -33,17 +33,19 @@ module tb_top;
     fifo_monitor    mon;
     fifo_sequence   seq;
     fifo_scoreboard scb;
+    fifo_coverage cov;
 
     // --- Test ---
     initial begin
         drv = new(dut_if);
         mon = new(dut_if);
         scb = new();
+        cov = new(dut_if);
         seq = new();
 
         drv.reset();
         mon.run();
-
+        cov.run();
         seq.run(drv, 150);
 
         repeat (10) @(posedge clk);
@@ -55,7 +57,7 @@ module tb_top;
             scb.on_read(mon.observed_reads[i]);
 
         scb.final_check();
-
+        cov.report();
         $finish;
     end
 

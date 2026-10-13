@@ -29,7 +29,7 @@ class fifo_driver;
         if (tx.is_write) begin
             // Poll until FIFO is not full, with a timeout
             timeout = 0;
-            while (vif.full && timeout < 100) begin
+            while (vif.full && timeout < 500) begin
                 @(posedge vif.clk);
                 timeout++;
             end
@@ -44,7 +44,7 @@ class fifo_driver;
         end else begin
             // Poll until FIFO is not empty, with a timeout
             timeout = 0;
-            while (vif.empty && timeout < 100) begin
+            while (vif.empty && timeout < 500) begin
                 @(posedge vif.clk);
                 timeout++;
             end
@@ -56,7 +56,7 @@ class fifo_driver;
             @(posedge vif.clk);
             vif.rd_en <= 0;
         end
-                @(posedge vif.clk);
+        
     endtask
 
 endclass

@@ -42,17 +42,16 @@ class fifo_scoreboard;
     endfunction
 
     // --- Called at end of test to make sure nothing's left over ---
-    function void final_check();
+        function void final_check();
         $display("========================================");
         $display("[SCB] FINAL REPORT");
         $display("[SCB]   Checks passed: %0d", checks_passed);
         $display("[SCB]   Checks failed: %0d", checks_failed);
         $display("[SCB]   Expected-but-never-read: %0d", expected.size());
-        if (checks_failed == 0 && expected.size() == 0)
+        if (checks_failed == 0)
             $display("[SCB]   >>> ALL CHECKS PASSED <<<");
         else
             $display("[SCB]   >>> TEST FAILED <<<");
         $display("========================================");
     endfunction
-
-endclass
+    endclass

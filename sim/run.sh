@@ -11,6 +11,7 @@ verilator --binary --timing -j 0 \
     tb/fifo_monitor.sv \
     tb/fifo_scoreboard.sv \
     tb/fifo_sequence.sv \
+    tb/fifo_coverage.sv \
     rtl/sync_fifo.v \
     tb/tb_top.sv
 
