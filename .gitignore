@@ -1,0 +1,17 @@
+# Verilator build output
+obj_dir/
+
+# Simulation artifacts
+*.vcd
+*.vvp
+*.fst
+*.wlf
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Python (in case you add scripts later)
+__pycache__/
+*.pyc
