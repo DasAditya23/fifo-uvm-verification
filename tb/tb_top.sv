@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-
+import fifo_pkg::*;
 module tb_top;
 
     localparam DATA_WIDTH = 8;
@@ -29,14 +29,19 @@ module tb_top;
         .empty   (dut_if.empty)
     );
 
-    // --- Declare the driver ---
-    fifo_driver drv;
+    // --- Testbench components ---
+    fifo_driver  drv;
+    fifo_monitor mon;
 
     // --- Test ---
     initial begin
-        // Create the driver, passing the interface handle
+        // Create and reset driver
         drv = new(dut_if);
         drv.reset();
+
+        // Create monitor and start observing in background
+        mon = new(dut_if);
+        mon.run();
 
         // Drive one write transaction
         begin
@@ -47,7 +52,14 @@ module tb_top;
             $display("Drove one write of 0xAA");
         end
 
-        repeat (5) @(posedge clk);
+        // Give the monitor time to observe
+        repeat (10) @(posedge clk);
+
+        // Report what the monitor saw
+        $display("--- Monitor Report ---");
+        $display("Writes observed: %0d", mon.observed_writes.size());
+        $display("Reads  observed: %0d", mon.observed_reads.size());
+
         $finish;
     end
 
