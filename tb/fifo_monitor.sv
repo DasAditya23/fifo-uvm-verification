@@ -6,7 +6,8 @@
 
 class fifo_monitor;
 
-    virtual fifo_if vif;
+        virtual fifo_if vif;
+    
 
     // Queues holding what we observed (in order)
     fifo_tx observed_writes[$];

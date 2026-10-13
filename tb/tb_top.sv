@@ -1,7 +1,6 @@
 `timescale 1ns/1ps
-import fifo_pkg::*;
-module tb_top;
 
+module tb_top;
     localparam DATA_WIDTH = 8;
     localparam DEPTH      = 16;
     localparam ADDR_WIDTH = 4;
@@ -29,52 +28,33 @@ module tb_top;
         .empty   (dut_if.empty)
     );
 
-    // --- Testbench components ---
-    fifo_driver  drv;
-    fifo_monitor mon;
+    // --- Testbench components (module-level) ---
+    fifo_driver     drv;
+    fifo_monitor    mon;
+    fifo_sequence   seq;
+    fifo_scoreboard scb;
 
     // --- Test ---
     initial begin
-        // Create and reset driver
         drv = new(dut_if);
-        drv.reset();
-
-        // Create monitor and start observing in background
         mon = new(dut_if);
+        scb = new();
+        seq = new();
+
+        drv.reset();
         mon.run();
 
-        // Drive one write transaction
-        begin
-            fifo_tx tx = new();
-            tx.is_write = 1;
-            tx.data     = 8'hAA;
-            drv.drive(tx);
-            $display("Drove one write of 0xAA");
-        end
-        // Drive one read transaction
-        begin
-            fifo_tx tx = new();
-            tx.is_write = 0;
-            drv.drive(tx);
-            $display("Drove one read");
-        end
-                // Give the monitor time to observe
+        seq.run(drv, 150);
+
         repeat (10) @(posedge clk);
 
-        // --- Scoreboard: compare writes vs reads ---
-        begin
-            fifo_scoreboard scb = new();
+        $display("--- Feeding scoreboard from monitor ---");
+        foreach (mon.observed_writes[i])
+            scb.on_write(mon.observed_writes[i]);
+        foreach (mon.observed_reads[i])
+            scb.on_read(mon.observed_reads[i]);
 
-            $display("--- Feeding scoreboard from monitor ---");
-            // Push all observed writes to scoreboard first
-            foreach (mon.observed_writes[i])
-                scb.on_write(mon.observed_writes[i]);
-            // Then push all observed reads
-            foreach (mon.observed_reads[i])
-                scb.on_read(mon.observed_reads[i]);
-
-            scb.final_check();
-        end
+        scb.final_check();
 
         $finish;
     end
