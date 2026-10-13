@@ -8,5 +8,7 @@ package fifo_pkg;
     `include "fifo_tx.sv"
     `include "fifo_driver.sv"
     `include "fifo_monitor.sv"
+    `include "fifo_scoreboard.sv"
+
 
 endpackage

@@ -51,14 +51,30 @@ module tb_top;
             drv.drive(tx);
             $display("Drove one write of 0xAA");
         end
-
-        // Give the monitor time to observe
+        // Drive one read transaction
+        begin
+            fifo_tx tx = new();
+            tx.is_write = 0;
+            drv.drive(tx);
+            $display("Drove one read");
+        end
+                // Give the monitor time to observe
         repeat (10) @(posedge clk);
 
-        // Report what the monitor saw
-        $display("--- Monitor Report ---");
-        $display("Writes observed: %0d", mon.observed_writes.size());
-        $display("Reads  observed: %0d", mon.observed_reads.size());
+        // --- Scoreboard: compare writes vs reads ---
+        begin
+            fifo_scoreboard scb = new();
+
+            $display("--- Feeding scoreboard from monitor ---");
+            // Push all observed writes to scoreboard first
+            foreach (mon.observed_writes[i])
+                scb.on_write(mon.observed_writes[i]);
+            // Then push all observed reads
+            foreach (mon.observed_reads[i])
+                scb.on_read(mon.observed_reads[i]);
+
+            scb.final_check();
+        end
 
         $finish;
     end
